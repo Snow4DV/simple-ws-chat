@@ -38,6 +38,10 @@ class JwtServiceImpl(
         return userName == userDetails.username && !isTokenExpired(token)
     }
 
+    override fun isTokenValid(token: String): Boolean {
+        return !isTokenExpired(token)
+    }
+
     private fun <T> extractClaim(token: String, claimsResolvers: Function<Claims, T>): T {
         val claims = extractAllClaims(token)
         return claimsResolvers.apply(claims)

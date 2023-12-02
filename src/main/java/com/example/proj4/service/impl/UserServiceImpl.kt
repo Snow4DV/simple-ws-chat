@@ -29,6 +29,8 @@ class UserServiceImpl(
             }
         }
 
+    override fun getUserByUsername(username: String): Optional<User> = userRepository.findUserByUsername(username)
+
 
     class UserDetailsServiceImpl(
         val userRepository: UserRepository

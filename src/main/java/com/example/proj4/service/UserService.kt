@@ -10,4 +10,6 @@ import java.util.*
 interface UserService {
     val userDetailsService: UserDetailsService
     val currentUser: Optional<User>
+
+    fun getUserByUsername(username: String): Optional<User>
 }

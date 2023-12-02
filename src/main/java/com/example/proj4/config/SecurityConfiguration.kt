@@ -3,6 +3,7 @@ package com.example.proj4.config
 import com.example.proj4.service.UserService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
@@ -15,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.web.authentication.HttpStatusEntryPoint
 
 
 @Configuration
@@ -23,13 +25,17 @@ open class SecurityConfiguration(private val jwtAuthenticationFilter: JwtAuthent
 
     @Bean
     open fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
-        http.csrf().disable()
-            .authorizeRequests { requests ->
-                requests.requestMatchers("/api/v1/auth/**").permitAll().anyRequest().authenticated()
-            }
+        http
+            .csrf().disable()
             .sessionManagement { manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .authorizeHttpRequests()
+            .requestMatchers("/api/v1/auth/**", "/resources/**", "/webs").permitAll()
+
+            .anyRequest().authenticated()
+            .and()
+            .exceptionHandling().authenticationEntryPoint(HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
 
         return http.build()
     }

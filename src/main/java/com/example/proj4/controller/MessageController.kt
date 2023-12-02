@@ -2,11 +2,17 @@ package com.example.proj4.controller
 
 import com.example.proj4.dao.request.SendMessageRequest
 import com.example.proj4.entity.Message
+import com.example.proj4.entity.User
 import com.example.proj4.service.MessageService
 import com.example.proj4.service.UserService
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.handler.annotation.SendTo
 import org.springframework.messaging.simp.SimpMessagingTemplate
+import org.springframework.messaging.support.MessageHeaderAccessor
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
@@ -18,24 +24,18 @@ import java.util.*
 
 
 @Controller
-@RequestMapping("/")
+@RequestMapping("/api/v1/")
 class MessageController(
     val userService: UserService,
     val messageService: MessageService,
     val messagingTemplate: SimpMessagingTemplate
 ) {
-    @GetMapping("/webs")
-    fun webs(): ModelAndView {
-        val modelAndView = ModelAndView()
-        modelAndView.viewName = "webs"
-        return modelAndView
-    }
 
     @MessageMapping("/chat.sendMessage")
     @SendTo("/topic/webs-topic")
-    fun send(messageRequest: SendMessageRequest): Message {
+    fun send(messageRequest: SendMessageRequest, principal: Principal): Message {
         val sendTime = LocalDateTime.now()
-        val currentUser = userService.currentUser.orElseThrow { UsernameNotFoundException("Пользователь не авторизован, или токен неверный") }
+        val currentUser = (principal as UsernamePasswordAuthenticationToken).principal as User
         val message = Message(currentUser, sendTime, messageRequest.text)
         messageService.saveMessage(message)
         return message

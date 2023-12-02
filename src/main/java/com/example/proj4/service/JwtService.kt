@@ -11,4 +11,5 @@ interface JwtService {
     fun generateToken(userDetails: UserDetails): String
 
     fun isTokenValid(token: String, userDetails: UserDetails): Boolean
+    fun isTokenValid(token: String): Boolean
 }

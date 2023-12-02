@@ -24,7 +24,7 @@ class AuthenticationServiceImpl(
 
 
     override fun signUp(request: SignUpRequest): JwtAuthenticationResponse {
-        val user = User(request.firstName, request.lastName, request.username, request.password, Role.USER)
+        val user = User(request.firstName, request.lastName, request.username, passwordEncoder.encode(request.password), Role.USER)
         userRepository.save(user)
         val jwt = jwtService.generateToken(user)
         return JwtAuthenticationResponse(jwt)
