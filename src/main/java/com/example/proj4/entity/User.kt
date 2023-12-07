@@ -8,21 +8,16 @@ import org.springframework.security.core.userdetails.UserDetails
 
 @Entity
 @Table(name = "_user")
-class User() : UserDetails{
-    lateinit var firstName: String
-    lateinit var lastName: String
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Int? = null
-
-
+open class User() : UserDetails{
+    open lateinit var firstName: String
+    open lateinit var lastName: String
+    open var online = false
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) open val id: Int? = null
     @Column(unique = true)
     private lateinit var username: String
     private lateinit var password: String
-
     @Enumerated(EnumType.STRING)
-    var role: Role = Role.USER
+    open var role: Role = Role.USER
 
 
 

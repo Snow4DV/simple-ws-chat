@@ -10,16 +10,6 @@ import java.time.LocalDateTime
 class MessageServiceImpl(
     val messageRepository: MessageRepository
 ) : MessageService {
-    override fun getMessagesBeforeInclusive(timestamp: LocalDateTime): List<Message> {
-        return messageRepository.getMessagesByTimestampLessThanEqualOrderByTimestamp(timestamp)
-    }
-
-    override fun getMessagesInRange(
-        startNotInclusive: LocalDateTime,
-        endInclusive: LocalDateTime
-    ): List<Message> {
-        return messageRepository.getMessagesByTimestampGreaterThanAndTimestampLessThanEqualOrderByTimestamp(startNotInclusive, endInclusive)
-    }
 
     override fun saveMessage(message: Message) {
         messageRepository.save(message)
@@ -27,5 +17,9 @@ class MessageServiceImpl(
 
     override fun getMessagesSortedByDate(): List<Message> {
         return messageRepository.findAllByOrderByTimestamp()
+    }
+
+    override fun getLatestMessageTimeByUserId(userId: Long): LocalDateTime? {
+        return messageRepository.findTopBySenderIdOrderByTimestampDesc(userId)?.timestamp
     }
 }

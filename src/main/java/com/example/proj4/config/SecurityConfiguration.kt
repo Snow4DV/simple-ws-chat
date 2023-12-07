@@ -31,8 +31,8 @@ open class SecurityConfiguration(private val jwtAuthenticationFilter: JwtAuthent
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
             .authorizeHttpRequests()
-            .requestMatchers("/api/v1/auth/**", "/resources/**", "/webs").permitAll()
-
+            .requestMatchers("/api/v1/auth/**", "/chat/**", "/webs").permitAll()
+            .requestMatchers("/error").permitAll()
             .anyRequest().authenticated()
             .and()
             .exceptionHandling().authenticationEntryPoint(HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))

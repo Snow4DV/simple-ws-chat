@@ -1,6 +1,7 @@
 package com.example.proj4.controller
 
 import com.example.proj4.dao.request.SendMessageRequest
+import com.example.proj4.dao.response.GetOnlineUserInfosResponse
 import com.example.proj4.entity.Message
 import com.example.proj4.entity.User
 import com.example.proj4.service.MessageService
@@ -38,6 +39,9 @@ class MessageController(
         val currentUser = (principal as UsernamePasswordAuthenticationToken).principal as User
         val message = Message(currentUser, sendTime, messageRequest.text)
         messageService.saveMessage(message)
+        val response =
+            GetOnlineUserInfosResponse(userService.getOnlineUsersWithLastActivity())
+        messagingTemplate.convertAndSend("/topic/webs-topic", response)
         return message
     }
 
@@ -45,5 +49,8 @@ class MessageController(
     fun subscribe(principal: Principal) {
         val chatHistory = messageService.getMessagesSortedByDate()
         messagingTemplate.convertAndSendToUser(principal.name, "/queue/history", chatHistory)
+        val response =
+            GetOnlineUserInfosResponse(userService.getOnlineUsersWithLastActivity())
+        messagingTemplate.convertAndSend("/topic/webs-topic", response)
     }
 }
